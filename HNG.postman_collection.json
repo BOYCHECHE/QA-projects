@@ -1,0 +1,3533 @@
+{
+	"info": {
+		"_postman_id": "dc50ddf1-3285-4858-88e1-c33a94090547",
+		"name": "HNG",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36184249",
+		"_collection_link": "https://cheches-team.postman.co/workspace/cheche's-team-Workspace~9163855f-622a-4d22-8dfc-b262ca5871cf/collection/36184249-dc50ddf1-3285-4858-88e1-c33a94090547?action=share&source=collection_link&creator=36184249"
+	},
+	"item": [
+		{
+			"name": "Auth/Login",
+			"item": [
+				{
+					"name": "Login & get token",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Define login credentials\r",
+									"pm.variables.set(\"username\", \"test_user\");\r",
+									"pm.variables.set(\"password\", \"test_password\")\r",
+									"\r",
+									"//Ensure base URL is set\r",
+									"pm.variables.set(\"{{baseUrl}}\")\r",
+									"\r",
+									"//Clear previously stored token\r",
+									"pm.variables.unset(\"auth_token\")"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"emilys\",\r\n    \"password\":\"emilyspass\"\r\n}\r\n    \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login with invalid credentials",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Define Login credentials\r",
+									"pm.variables.set(\"username\",\"emilys\");\r",
+									"pm.variables.set(\"password\",\"emilyspass\");\r",
+									"\r",
+									"// Ensure base URL is set \r",
+									"pm.variables.set(\"{{baseUrl}}\");\r",
+									"\r",
+									"// Clear any previously stored token\r",
+									"pm.variables.unset(\"auth_token\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validate Response Status Code\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Validate Response Time (Should be <= 500ms)\r",
+									"pm.test(\"Response time is within limit\",function(){\r",
+									"    pm.expect(pm.response.time.responseTime).to.be.below(500);\r",
+									"})\r",
+									"\r",
+									"// Extract and store token for future requests\r",
+									"if(pm.response.code ===200){\r",
+									"    let jsonData = pm.response.json();\r",
+									"    if (jsonData .token){\r",
+									"        pm.variables.set(\"auth_token\", jsonData.token);\r",
+									"        console.log(\"Auth token saved:\",jsonData.token);\r",
+									"\r",
+									"\r",
+									"    }\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n    \"username\": \"cheche\",\r\n    \"password\": \"boychec\"\r\n  }\r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Ensure token is avaliable before making request\r",
+									"pm.test(\"Authtoken is set\"), function () {\r",
+									"    pm.expect(pm.variables.get(\"auth_token\")).to.exist;\r",
+									"};\r",
+									"// Add token to Authorization Header\r",
+									"pm.request.headers.add({\r",
+									" key:\"Authorization\",\r",
+									" value:\"Bearer\" + pm.variables.get(\"auth_token\")\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validate Response Status Code\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Validate Response Time (Should be <= 500ms)\r",
+									"pm.test(\"Response time is within limit\",function(){\r",
+									"    pm.expect(pm.response.time.responseTime).to.be.below(500);\r",
+									"})\r",
+									"\r",
+									"// Validate that user data exist in response\r",
+									"pm.test(\"User data is returned\", function (){\r",
+									"    let jsonData =pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"id\")\r",
+									"    pm.expect(jsonData).to.have.property(\"username\")\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n    \"username\": \"emilys\",\r\n    \"password\": \"emilyspass\"\r\n    \r\n  }\r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a non user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Ensure token is avaliable before making request\r",
+									"pm.test(\"Authtoken is set\"), function () {\r",
+									"    pm.expect(pm.variables.get(\"auth_token\")).to.exist;\r",
+									"};\r",
+									"// Add token to Authorization Header\r",
+									"pm.request.headers.add({\r",
+									" key:\"Authorization\",\r",
+									" value:\"Bearer\" + pm.variables.get(\"auth_token\")\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validate Response Status Code\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Validate Response Time (Should be <= 500ms)\r",
+									"pm.test(\"Response time is within limit\",function(){\r",
+									"    pm.expect(pm.response.time.responseTime).to.be.below(500);\r",
+									"})\r",
+									"\r",
+									"// Validate that user data exist in response\r",
+									"pm.test(\"User data is returned\", function (){\r",
+									"    let jsonData =pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"id\")\r",
+									"    pm.expect(jsonData).to.have.property(\"username\")\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n    \"username\": \"kennedy\",\r\n    \"password\": \"kennnnn\"\r\n    \r\n  }\r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh auth",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Ensure auth token exists before making request\r",
+									"pm.test(\"Auth token is set\", function (){\r",
+									"    pm.expect(pm.variables.get(\"auth_token\")).to.exist;\r",
+									"});\r",
+									"\r",
+									"// Add token to Athorization Header \r",
+									"pm.request.headers.add({\r",
+									"    key: \"Authorization\",\r",
+									"    value:\"Bearer\" + pm.variables.get(\"auth_token\")\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validate Response Status Code\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Validate Response Time (Should be <= 500ms)\r",
+									"pm.test(\"Response time is within limit\",function(){\r",
+									"    pm.expect(pm.response.time.responseTime).to.be.below(500);\r",
+									"})\r",
+									"\r",
+									"// Ensure and store new token \r",
+									"if (pm.respond.code === 200){\r",
+									"    let jsonData = pm.response.json();\r",
+									"    if (jsonData.token){\r",
+									"        pm.variables.set(\"auth_token\", jsonData.token);\r",
+									"        console.log(\"New Auth token saved:\", jsonData.token);\r",
+									"    }\r",
+									"}\r",
+									"// Ensure new token exist for further requests\r",
+									"pm.test(\"New token is received and stored\",function () {\r",
+									"    pm.expect(pm.variables.get(\"auth_token\")).to.exist;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh auth with invalid token",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Ensure auth token exists before making request\r",
+									"pm.test(\"Auth token is set\", function (){\r",
+									"    pm.expect(pm.variables.get(\"auth_token\")).to.exist;\r",
+									"});\r",
+									"\r",
+									"// Add token to Athorization Header \r",
+									"pm.request.headers.add({\r",
+									"    key: \"Authorization\",\r",
+									"    value:\"Bearer\" + pm.variables.get(\"auth_token\")\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validate Response Status Code\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Validate Response Time (Should be <= 500ms)\r",
+									"pm.test(\"Response time is within limit\",function(){\r",
+									"    pm.expect(pm.response.time.responseTime).to.be.below(500);\r",
+									"})\r",
+									"\r",
+									"// Ensure and store new token \r",
+									"if (pm.respond.code === 200){\r",
+									"    let jsonData = pm.response.json();\r",
+									"    if (jsonData.token){\r",
+									"        pm.variables.set(\"auth_token\", jsonData.token);\r",
+									"        console.log(\"New Auth token saved:\", jsonData.token);\r",
+									"    }\r",
+									"}\r",
+									"// Ensure new token exist for further requests\r",
+									"pm.test(\"New token is received and stored\",function () {\r",
+									"    pm.expect(pm.variables.get(\"auth_token\")).to.exist;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7P\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "Get a single product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Product ID is correct\", function (){\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.equal(parseInt(pm.request.url.variable.get(\"id\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/30",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"30"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a single invalid product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Product ID is correct\", function (){\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.equal(parseInt(pm.request.url.variable.get(\"id\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/3000",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"3000"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search for a product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Search results contain query\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.product.length).to.be.above(0);\r",
+									"    pm.expect(jsonData.products[0].title.toLowerCase().to.include(pm.request.url.query.get(\"q\").toLowerCase()));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/search?q=phone",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "phone"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Limit and skip product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct number of products returned\", function (){\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.products.length).to.be.at.most(parseInt(pm.request.url.query.get(\"limit\")));\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/?limit=10&skip=10&select=title,price'",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								""
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "skip",
+									"value": "10"
+								},
+								{
+									"key": "select",
+									"value": "title,price'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid limit and invalid skip product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct number of products returned\", function (){\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.products.length).to.be.at.most(parseInt(pm.request.url.query.get(\"limit\")));\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/?limit=fix&skip=kill&select=title,price'",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								""
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "fix"
+								},
+								{
+									"key": "skip",
+									"value": "kill"
+								},
+								{
+									"key": "select",
+									"value": "title,price'"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all products",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Products list is not empty\", function (){\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.product).to.be.an(\"array\").that.is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid get all products",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Products list is not empty\", function (){\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.product).to.be.an(\"array\").that.is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/productz",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"productz"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sort product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Products are sorted correctly\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var products = jsonData.products;\r",
+									"    for(var i = 1; i < products.length; i++){\r",
+									"        pm.expect(products[i - 1].price).to.be.at.most (product[i].price);\r",
+									"    };\r",
+									"\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products?sortBy=title&order=asc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "sortBy",
+									"value": "title"
+								},
+								{
+									"key": "order",
+									"value": "asc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid sort product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Products are sorted correctly\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var products = jsonData.products;\r",
+									"    for(var i = 1; i < products.length; i++){\r",
+									"        pm.expect(products[i - 1].price).to.be.at.most (product[i].price);\r",
+									"    };\r",
+									"\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products?sortBy=junior&order=des",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "sortBy",
+									"value": "junior"
+								},
+								{
+									"key": "order",
+									"value": "des"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all product categories",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Categories list is not empty\", function () {\r",
+									"var jsonData = pm.response.json();\r",
+									"pm.expect(jsonData).to.be.an(\"array\").that.is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get product by category list",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Category matches the request\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonData.products[0].category).to.equal(decodeURIComponent(pm.request.url.variables.get(\"categoryName\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/category-list",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"category-list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a product by a category",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Products is successfully added\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.be.a(\"number\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJlbWlseXMiLCJlbWFpbCI6ImVtaWx5LmpvaG5zb25AeC5kdW1teWpzb24uY29tIiwiZmlyc3ROYW1lIjoiRW1pbHkiLCJsYXN0TmFtZSI6IkpvaG5zb24iLCJnZW5kZXIiOiJmZW1hbGUiLCJpbWFnZSI6Imh0dHBzOi8vZHVtbXlqc29uLmNvbS9pY29uL2VtaWx5cy8xMjgiLCJpYXQiOjE3Mzk4MjczMjYsImV4cCI6MTc0MjQxOTMyNn0.31WEBDERm1c1mgZWA-qybpJlKe6I85EvlpTXw3hp7PU\",\r\n     \r\n    \"expiresInMins\": \"30\" // optional (FOR ACCESS TOKEN), defaults to 60 \r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/category/smartphones",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"category",
+								"smartphones"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add a product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Products is successfully added\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.be.a(\"number\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"title\": \"BMW Pencil\"\r\n\r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Product is successfully updated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var requestData = JSON.parse(pm.request.body.raw);\r",
+									"    pm.expect(jsonData.title).to.equal(requestData.title);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"title\": \"iPhone Galaxy +1\"\r\n\r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Product is successfully deleted\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.isDeleted).to.be.true;\r",
+									"\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Access Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\r\n    \"title\": \"iPhone Galaxy +1\"\r\n\r\n  }\r\n  \r\n  \r\n   ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "Get all cart",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Carts list is not empty\",function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.carts).to.be.an(\"array\").that.is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/carts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid get all cart",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Carts list is not empty\",function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.carts).to.be.an(\"array\").that.is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cartz",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cartz"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a single cart",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"pm.test(\"Cart ID is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.equal(parseInt(pm.request.url.variables.get(\"id\")));\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/carts/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carts",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Get a single cart",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"pm.test(\"Cart ID is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.equal(parseInt(pm.request.url.variables.get(\"id\")));\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/carts/51",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carts",
+								"51"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get carts by user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Carts belong to the correct user\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var userId = parseInt(pm.request.url.variables.get(\"userId\"));\r",
+									"    pm.expect(jsonData.carts.length).to.be.above(0);\r",
+									"    pm.expect(jsonData.carts[0].userId).to.equal(userId);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/carts/user/142",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carts",
+								"user",
+								"142"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid get carts by user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Carts belong to the correct user\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var userId = parseInt(pm.request.url.variables.get(\"userId\"));\r",
+									"    pm.expect(jsonData.carts.length).to.be.above(0);\r",
+									"    pm.expect(jsonData.carts[0].userId).to.equal(userId);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/carts/user/455",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carts",
+								"user",
+								"455"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add a cart",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Cart is successfully added\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.be.a(\"number\");\r",
+									"    pm.expect(jsonData.products).to.be.an(\"array\").that.is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n\r\n    \"userId\": 1,\r\n         \"products\": [\r\n      {\r\n        \"id\": 144,\r\n        \"quantity\": 4\r\n      },\r\n      {\r\n        \"id\": 98,\r\n        \"quantity\": 1\r\n      }\r\n    ]\r\n  }\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/carts/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carts",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a cart",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Carts is successfully updated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var requestData = JSON.parse(pm.request.body.raw);\r",
+									"    pm.expect(jsonData.products.length).to.equal(requestData.products.length);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"products\" : [\r\n   {\r\n     \"id\": 1,\r\n     \"quantity\" :4\r\n   }\r\n  ]\r\n}\r\n\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/carts/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a cart",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Cart is successfully deleted\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.is.Deleted).to.be.true;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/carts/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Post",
+			"item": [
+				{
+					"name": "Get all post",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Posts list is not empty\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.posts).to.be.an(\"array\").that.is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Get all post",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Posts list is not empty\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.posts).to.be.an(\"array\").that.is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/postZ",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"postZ"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a single post",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Post ID is correct\", function () {\r",
+									"  var jsonData = pm.response.json();\r",
+									"  pm.expect(jsonData.id).to.equal(parseInt(pm.request.url.variables.get(\"id\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search posts",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Search result contain query\", function (){\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.posts.length).to.be.above(0);\r",
+									"    pm.expect(jsonData.post[0].title.tolowerCase()).to.includde(pm.request.url.query.get(\"q\").tolowerCase());\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/search?q=love",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "love"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Limit & Skip post",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Correct numbers of posts returned\", function() {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.posts.length).to.be.at.most(parseInt(pm.request.url.query.get(\"limit\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts?limit=10&skip=10&select=title,reactions,userId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "skip",
+									"value": "10"
+								},
+								{
+									"key": "select",
+									"value": "title,reactions,userId"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sort posts",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Posts are sorted correctly\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var posts = jsonData.posts;\r",
+									"    for (var i =1; i < posts.length; i++) {\r",
+									"        pm.expect(posts[i - 1].likes).to.be.at.most(posts[i].likes);\r",
+									"    }\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts?sortBy=title&order=asc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sortBy",
+									"value": "title"
+								},
+								{
+									"key": "order",
+									"value": "asc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all post tags",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Tags list is not empty\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.be.an(\"array\").that.is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/tags",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a post by tag list",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Posts belong to the correct tag\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.post[0].tags).to.include(decodeURIComponent(pm.request.url.variable.get(\"tagName\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/tag-list",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"tag-list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a post by tag",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Posts belong to the correct tag\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.post[0].tags).to.include(decodeURIComponent(pm.request.url.variable.get(\"tagName\")));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/tag/life",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"tag",
+								"life"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all post by user id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Posts belong to the current user\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var userId = parseInt(pm.request.url.variables.get(\"userId\"));\r",
+									"    pm.expect(jsonData.post.length).to.be.above(0);\r",
+									"    pm.expect(jsonData.post[0].userId).to.equal(userId);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/user/5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"user",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get post's comment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Comments belong to the correct post\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.comments.length).to.be.above(0);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/1/comments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"1",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add a post",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Posts are added successfully\",function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.be.a(\"number\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \r\n    \"title\": \"I am in love with someone.\",\r\n    \"userId\": 5\r\n\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/posts/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a post",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Posts is successfully updated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var requestData = JSON.parse(pm.request.body.raw);\r",
+									"    pm.expect(jsonData.title).to.equal(requestData.title);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"title\": \"I think i should shift the moon.\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/posts/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a post",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Set request start time\r",
+									"pm.environment.set(\"requestStartTime\", new Date().getTime());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Calculate response time\r",
+									"var requestStartTime = pm.environment.get(\"requestStartTime\");\r",
+									"var responseTime = new Date().getTime() - requestStartTime\r",
+									"\r",
+									"// Set response time threshold \r",
+									"var maxResponseTime = 500; // in milliseconds\r",
+									"\r",
+									"// Check if response time is within the limit \r",
+									"pm.test(\"Response timee is within\" + maxResponseTime + \"ms\", function (){\r",
+									"pm.expect(responseTime).to.be.below(maxResponseTime);\r",
+									"});\r",
+									"\r",
+									"// Validate status codes\r",
+									"pm.test(\"Status code is 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Ensure reponse is JSON\r",
+									"pm.test(\"Response is JSON\", function (){\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Post is successfully deleted\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.isDeleted).to.be.true;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "Access Token",
+			"value": "....",
+			"type": "string"
+		},
+		{
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "randomUsername",
+			"value": ""
+		},
+		{
+			"key": "randomPassword",
+			"value": ""
+		},
+		{
+			"key": "Username",
+			"value": ""
+		},
+		{
+			"key": "Password",
+			"value": ""
+		}
+	]
+}
